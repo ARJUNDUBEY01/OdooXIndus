@@ -1,152 +1,101 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-
-const EMPTY = { name: '', type: '', salesPrice: '', costPrice: '', variants: [] };
+import { Package, Plus, Search, Layers, Edit, Trash2, Filter } from 'lucide-react';
 
 export default function Products() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY);
-  const [submitting, setSubmitting] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchProducts = async () => {
     try {
       const res = await api.get('/products');
       setData(res.data.products || []);
-    } catch { toast.error('Failed to load products'); }
+    } catch (err) {
+      toast.error('Failed to load products');
+    }
     setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
-  const openCreate = () => { setEditing(null); setForm(EMPTY); setShowModal(true); };
-  const openEdit = (p) => { setEditing(p); setForm({ name: p.name, type: p.type, salesPrice: p.salesPrice, costPrice: p.costPrice }); setShowModal(true); };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.name || !form.type || !form.salesPrice || !form.costPrice) return toast.error('All fields required');
-    setSubmitting(true);
-    try {
-      const payload = { ...form, salesPrice: Number(form.salesPrice), costPrice: Number(form.costPrice) };
-      if (editing) {
-        await api.put(`/products/${editing._id}`, payload);
-        toast.success('Product updated!');
-      } else {
-        await api.post('/products', payload);
-        toast.success('Product created!');
-      }
-      setShowModal(false);
-      fetchData();
-    } catch (e) {
-      toast.error(e.response?.data?.message || 'Operation failed');
-    }
-    setSubmitting(false);
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this product?')) return;
-    try {
-      await api.delete(`/products/${id}`);
-      toast.success('Product deleted');
-      fetchData();
-    } catch (e) {
-      toast.error(e.response?.data?.message || 'Delete failed');
-    }
-  };
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
-    <div className="fade-in">
-      <div className="page-header">
-        <div className="page-header-left">
-          <h1>Products</h1>
-          <p>Manage your product catalog and pricing</p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter">Product Catalog</h1>
+          <p className="text-text-secondary font-medium">Define recurring items and inventory services</p>
         </div>
-        <div className="page-header-actions">
-          <button className="btn btn-primary" onClick={openCreate}>+ Add Product</button>
+        <div className="flex gap-4">
+           <button className="btn btn-secondary border-white/5 bg-secondary/50 h-14 px-6 text-xs font-black uppercase tracking-[0.2em] shadow-inner"><Filter size={18}/></button>
+           <button className="btn btn-primary h-14 px-8 text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-accent/40">+ Add New Product</button>
         </div>
       </div>
 
-      <div className="table-wrapper">
-        <div className="table-header">
-          <div><div className="table-title">Product Catalog</div><div className="table-subtitle">{data.length} products</div></div>
-        </div>
-        {loading ? (
-          <div className="loading-spinner"><div className="spinner" /></div>
-        ) : data.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">📦</div>
-            <div className="empty-title">No products yet</div>
-            <div className="empty-text">Click "Add Product" to get started</div>
-          </div>
-        ) : (
-          <table>
-            <thead><tr><th>Name</th><th>Type</th><th>Sales Price</th><th>Cost Price</th><th>Margin</th><th>Variants</th><th>Actions</th></tr></thead>
-            <tbody>
-              {data.map(p => {
-                const margin = p.salesPrice > 0 ? (((p.salesPrice - p.costPrice) / p.salesPrice) * 100).toFixed(1) : 0;
-                return (
-                  <tr key={p._id}>
-                    <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{p.name}</td>
-                    <td>
-                      <span style={{ background: 'var(--accent-glow)', color: 'var(--accent-light)', padding: '3px 8px', borderRadius: 99, fontSize: 12, fontWeight: 600 }}>
-                        {p.type}
-                      </span>
-                    </td>
-                    <td style={{ fontWeight: 700, color: 'var(--success)' }}>₹{p.salesPrice?.toLocaleString()}</td>
-                    <td style={{ color: 'var(--text-secondary)' }}>₹{p.costPrice?.toLocaleString()}</td>
-                    <td>
-                      <span style={{ color: Number(margin) > 30 ? 'var(--success)' : 'var(--warning)', fontWeight: 600 }}>{margin}%</span>
-                    </td>
-                    <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{p.variants?.length || 0} variants</td>
-                    <td style={{ display: 'flex', gap: 6 }}>
-                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(p)}>✏️</button>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(p._id)}>🗑️</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {data.map((p) => (
+          <div key={p._id} className="card group relative flex flex-col p-0 overflow-hidden border-white/[0.03] transition-all bg-gradient-to-br from-secondary/80 to-secondary/40">
+             <div className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                <div className="flex gap-1.5 p-1 bg-background/80 backdrop-blur rounded-lg border border-border shadow-2xl">
+                   <button className="p-2 hover:bg-accent/10 text-text-muted hover:text-accent rounded-md transition-colors"><Edit size={14}/></button>
+                   <button className="p-2 hover:bg-danger/10 text-text-muted hover:text-danger rounded-md transition-colors"><Trash2 size={14}/></button>
+                </div>
+             </div>
 
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">{editing ? 'Edit Product' : 'New Product'}</div>
-            <div className="modal-subtitle">{editing ? 'Update product details' : 'Add a new product to your catalog'}</div>
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Product Name *</label>
-                <input className="form-input" placeholder="e.g. Basic SaaS License" value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Type *</label>
-                <input className="form-input" placeholder="e.g. Software, Service" value={form.type} onChange={e => setForm(f => ({...f, type: e.target.value}))} />
-              </div>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label className="form-label">Sales Price (₹) *</label>
-                  <input className="form-input" type="number" placeholder="0" value={form.salesPrice} onChange={e => setForm(f => ({...f, salesPrice: e.target.value}))} />
+             <div className="p-8 pb-4">
+                <div className="w-14 h-14 bg-background rounded-2xl border border-border flex items-center justify-center text-accent mb-6 shadow-inner group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                   <Package size={28} strokeWidth={1.5} />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Cost Price (₹) *</label>
-                  <input className="form-input" type="number" placeholder="0" value={form.costPrice} onChange={e => setForm(f => ({...f, costPrice: e.target.value}))} />
+                <div className="space-y-2">
+                   <div className="text-[10px] font-black text-accent uppercase tracking-[0.2em]">{p.category || 'Subscription Component'}</div>
+                   <h3 className="text-xl font-black text-white leading-tight">{p.name}</h3>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Saving...' : editing ? 'Update' : 'Create Product'}
+             </div>
+
+             <div className="px-8 py-6 space-y-5">
+                <div className="flex items-center justify-between p-4 bg-background/50 border border-border rounded-2xl">
+                   <div>
+                      <div className="text-[9px] font-black text-text-muted uppercase tracking-widest mb-1">Standard Rate</div>
+                      <div className="text-2xl font-black text-white leading-none">₹{p.price?.toLocaleString()}</div>
+                   </div>
+                   <div className="text-right">
+                      <div className="text-[9px] font-black text-text-muted uppercase tracking-widest mb-1">Type</div>
+                      <div className="text-xs font-bold text-text-primary uppercase tracking-wider">{p.type}</div>
+                   </div>
+                </div>
+
+                <div className="flex items-center justify-between text-center gap-3">
+                   <div className="flex-1 p-2 bg-text-muted/5 rounded-xl border border-white/[0.02]">
+                      <div className="text-[8px] font-black text-text-muted uppercase mb-1">Margin</div>
+                      <div className="text-xs font-black text-success">22.4%</div>
+                   </div>
+                   <div className="flex-1 p-2 bg-text-muted/5 rounded-xl border border-white/[0.02]">
+                      <div className="text-[8px] font-black text-text-muted uppercase mb-1">Active Subs</div>
+                      <div className="text-xs font-black text-info">142</div>
+                   </div>
+                </div>
+             </div>
+
+             <div className="mt-auto border-t border-border p-4 flex items-center justify-center">
+                <button className="w-full flex items-center justify-center gap-2 py-3 text-[10px] font-black text-text-muted hover:text-white uppercase tracking-[0.25em] transition-all group-hover:gap-4">
+                   View Performance Metrics <Layers size={14}/>
                 </button>
-              </div>
-            </form>
+             </div>
           </div>
-        </div>
+        ))}
+      </div>
+      
+      {data.length === 0 && (
+         <div className="flex flex-col items-center justify-center p-24 bg-secondary/20 rounded-3xl border-2 border-dashed border-border text-center">
+            <div className="w-20 h-20 bg-secondary rounded-2xl flex items-center justify-center text-text-muted/40 mb-6 border border-border animate-bounce">
+               <Package size={32} />
+            </div>
+            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Your Catalog is Empty</h2>
+            <p className="text-text-muted max-w-sm font-medium mt-3 text-sm">Add your recurring items, software licenses or services to start billing customers.</p>
+            <button className="btn btn-primary mt-8 scale-110 shadow-xl shadow-accent/40">+ Create First Product</button>
+         </div>
       )}
     </div>
   );

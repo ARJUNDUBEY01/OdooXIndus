@@ -1,158 +1,141 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { CreditCard, Plus, Search, Calendar, ChevronRight, MoreVertical, Wallet, Banknote, Landmark } from 'lucide-react';
+
+const METHOD_ICONS = {
+  card: { icon: CreditCard, color: 'text-accent', bg: 'bg-accent/10' },
+  bank_transfer: { icon: Landmark, color: 'text-info', bg: 'bg-info/10' },
+  upi: { icon: Wallet, color: 'text-success', bg: 'bg-success/10' },
+  cash: { icon: Banknote, color: 'text-warning', bg: 'bg-warning/10' },
+};
 
 export default function Payments() {
-  const [payments, setPayments] = useState([]);
-  const [invoices, setInvoices] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ invoice: '', method: 'card', amount: '', note: '' });
-  const [submitting, setSubmitting] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchPayments = async () => {
     try {
-      const [pRes, iRes] = await Promise.all([
-        api.get('/payments'),
-        api.get('/invoices?status=confirmed'),
-      ]);
-      setPayments(pRes.data.payments || []);
-      setInvoices(iRes.data.invoices || []);
-    } catch (e) { toast.error('Failed to load'); }
+      const res = await api.get('/payments');
+      setData(res.data.payments || []);
+    } catch (err) {
+      toast.error('Failed to load payments');
+    }
     setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchPayments(); }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.invoice || !form.amount) return toast.error('Invoice and amount required');
-    setSubmitting(true);
-    try {
-      const res = await api.post('/payments', {
-        invoice: form.invoice,
-        method: form.method,
-        amount: Number(form.amount),
-        note: form.note,
-      });
-      toast.success(res.data.message || 'Payment recorded!');
-      setShowModal(false);
-      setForm({ invoice: '', method: 'card', amount: '', note: '' });
-      fetchData();
-    } catch (e) {
-      toast.error(e.response?.data?.message || 'Payment failed');
-    }
-    setSubmitting(false);
-  };
-
-  const METHODS = ['cash', 'card', 'bank_transfer', 'upi', 'cheque', 'online'];
-  const methodEmoji = { cash: '💵', card: '💳', bank_transfer: '🏦', upi: '📱', cheque: '📄', online: '🌐' };
+  if (loading) return <div className="flex items-center justify-center h-96"><div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div></div>;
 
   return (
-    <div className="fade-in">
-      <div className="page-header">
-        <div className="page-header-left">
-          <h1>Payments</h1>
-          <p>Record and track all payment transactions</p>
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pointer-events-none">
+        <div>
+          <h1 className="text-3xl font-black text-white leading-tight">Payment Transactions</h1>
+          <p className="text-text-secondary font-medium mt-1">Verified records of financial inflows</p>
         </div>
-        <div className="page-header-actions">
-          <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-            + Record Payment
+        <div className="flex gap-4 pointer-events-auto">
+          <button className="btn btn-secondary border border-border shadow-sm group">
+            <span className="text-text-muted transition-colors px-1"><Calendar size={18}/></span>
+            <span className="text-xs font-black uppercase tracking-widest">History Log</span>
+          </button>
+          <button className="btn btn-primary shadow-xl shadow-accent/20 group">
+            <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+            <span className="text-xs font-black uppercase tracking-widest">Record Payment</span>
           </button>
         </div>
       </div>
 
-      <div className="table-wrapper">
-        <div className="table-header">
-          <div>
-            <div className="table-title">Payment History</div>
-            <div className="table-subtitle">{payments.length} transactions</div>
-          </div>
-        </div>
-        {loading ? (
-          <div className="loading-spinner"><div className="spinner" /></div>
-        ) : payments.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">💳</div>
-            <div className="empty-title">No payments yet</div>
-            <div className="empty-text">Record your first payment above</div>
-          </div>
-        ) : (
-          <table>
-            <thead><tr><th>Invoice</th><th>Customer</th><th>Method</th><th>Amount</th><th>Date</th><th>Invoice Status</th></tr></thead>
-            <tbody>
-              {payments.map(p => (
-                <tr key={p._id}>
-                  <td style={{ fontWeight: 600, color: 'var(--accent-light)', fontSize: 12 }}>
-                    {p.invoice?.invoiceNumber || '—'}
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)' }}>{p.invoice?.customer?.name || '—'}</div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p.invoice?.customer?.email}</div>
-                  </td>
-                  <td>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span>{methodEmoji[p.method] || '💳'}</span>
-                      <span style={{ textTransform: 'capitalize' }}>{p.method?.replace('_', ' ')}</span>
-                    </span>
-                  </td>
-                  <td style={{ fontWeight: 800, color: 'var(--success)', fontSize: 15 }}>₹{p.amount?.toFixed(2)}</td>
-                  <td style={{ fontSize: 12 }}>{new Date(p.date).toLocaleDateString()}</td>
-                  <td><span className={`badge ${p.invoice?.status}`}>{p.invoice?.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+         {Object.entries(METHOD_ICONS).map(([key, cfg]) => {
+           const matches = data.filter(p => p.method === key);
+           const total = matches.reduce((acc, p) => acc + (p.amount || 0), 0);
+           return (
+             <div key={key} className="card group hover:-translate-y-1 transition-all duration-300">
+               <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-2xl ${cfg.bg} ${cfg.color} group-hover:scale-110 transition-transform`}>
+                     <cfg.icon size={28} />
+                  </div>
+                  <div>
+                     <div className="text-[10px] font-black uppercase tracking-widest text-text-muted">{key.replace('_', ' ')}</div>
+                     <div className="text-2xl font-black text-white mt-0.5">₹{total.toLocaleString()}</div>
+                  </div>
+               </div>
+               <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
+                  <span className="text-xs font-bold text-text-muted">{matches.length} Transactions</span>
+                  <div className="flex items-center gap-1 text-xs font-bold text-accent">View all <ChevronRight size={14}/></div>
+               </div>
+             </div>
+           );
+         })}
       </div>
 
-      {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
-            <div className="modal-title">Record Payment</div>
-            <div className="modal-subtitle">Link payment to a confirmed invoice</div>
-
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Invoice *</label>
-                <select className="form-select" value={form.invoice} onChange={e => setForm(f => ({...f, invoice: e.target.value}))}>
-                  <option value="">Select confirmed invoice</option>
-                  {invoices.map(i => (
-                    <option key={i._id} value={i._id}>
-                      {i.invoiceNumber} — {i.customer?.name} — ₹{i.totalAmount?.toFixed(2)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label className="form-label">Amount (₹) *</label>
-                  <input className="form-input" type="number" placeholder="0.00" value={form.amount}
-                    onChange={e => setForm(f => ({...f, amount: e.target.value}))} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Method *</label>
-                  <select className="form-select" value={form.method} onChange={e => setForm(f => ({...f, method: e.target.value}))}>
-                    {METHODS.map(m => <option key={m} value={m}>{methodEmoji[m]} {m.replace('_', ' ')}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Note (optional)</label>
-                <input className="form-input" placeholder="Payment note..." value={form.note}
-                  onChange={e => setForm(f => ({...f, note: e.target.value}))} />
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? 'Processing...' : '💳 Record Payment'}
-                </button>
-              </div>
-            </form>
+      <div className="card !p-0 border-white/5 backdrop-blur-xl">
+        <div className="p-6 border-b border-border flex flex-col md:flex-row items-center justify-between gap-6 bg-secondary/10">
+          <div className="relative w-full max-w-lg">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" size={18} />
+            <input className="w-full bg-background border border-border rounded-2xl pl-12 pr-4 py-4 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-accent/40 focus:border-accent/40 transition-all placeholder:text-text-muted/60" 
+              placeholder="Search reference numbers or invoice IDs..." />
+          </div>
+          <div className="flex items-center gap-1">
+             <button className="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-text-primary bg-background border border-border hover:bg-secondary transition-colors">Export CSV</button>
           </div>
         </div>
-      )}
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-border bg-secondary/[0.05] text-[10px] font-black uppercase tracking-widest text-text-muted">
+                <th className="px-8 py-5">TXN Reference</th>
+                <th className="px-8 py-5">Method</th>
+                <th className="px-8 py-5">Linked Invoice</th>
+                <th className="px-8 py-5">Payment Date</th>
+                <th className="px-8 py-5">Amount (₹)</th>
+                <th className="px-8 py-5 text-right">More</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/20">
+              {data.map((pay) => {
+                const m = METHOD_ICONS[pay.method] || METHOD_ICONS.card;
+                return (
+                  <tr key={pay._id} className="hover:bg-accent/[0.02] transition-colors group">
+                    <td className="px-8 py-6">
+                       <div className="flex flex-col">
+                          <div className="text-sm font-black text-white tracking-widest font-mono">{pay.transactionId || 'N/A'}</div>
+                          <div className="text-[10px] font-bold text-text-muted/60 flex items-center gap-2 mt-1">
+                            LOG ID: {pay._id.slice(-8).toUpperCase()}
+                          </div>
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${m.bg} ${m.color}`}><m.icon size={16}/></div>
+                          <span className="text-xs font-bold text-text-primary capitalize">{pay.method.replace('_', ' ')}</span>
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="text-xs font-black text-accent bg-accent/5 px-2 py-1 rounded inline-block border border-accent/10">{pay.invoice?.number || 'Manual Deposit'}</div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="flex flex-col">
+                          <div className="text-sm font-bold text-text-primary">{new Date(pay.date).toLocaleDateString()}</div>
+                          <div className="text-[9px] font-bold text-text-muted uppercase tracking-widest mt-0.5">{new Date(pay.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                       </div>
+                    </td>
+                    <td className="px-8 py-6">
+                       <div className="text-lg font-black text-success">₹{pay.amount?.toLocaleString()}</div>
+                    </td>
+                    <td className="px-8 py-6 text-right">
+                       <button className="p-2 hover:bg-secondary rounded-xl text-text-muted transition-all active:scale-90"><MoreVertical size={18}/></button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }

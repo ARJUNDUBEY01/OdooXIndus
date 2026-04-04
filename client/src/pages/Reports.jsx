@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { Calendar, Filter, Download, ArrowUpRight, TrendingUp, Info } from 'lucide-react';
 
 const COLORS = ['#6c63ff', '#10d98a', '#f59e0b', '#38bdf8', '#ef4444'];
 
@@ -35,103 +36,120 @@ export default function Reports() {
   const revByStatus = revenue ? Object.entries(revenue.revenueByStatus || {}).map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) })) : [];
 
   return (
-    <div className="fade-in">
-      <div className="page-header">
-        <div className="page-header-left"><h1>Reports & Analytics</h1><p>Business intelligence and financial overview</p></div>
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <h1 className="text-3xl font-black text-white italic uppercase tracking-tighter leading-none">Intelligence Engine</h1>
+          <p className="text-text-secondary font-medium mt-1">Cross-module performance & financial KPIs</p>
+        </div>
+        <div className="flex gap-4">
+           <div className="flex bg-secondary/50 rounded-2xl border border-border p-1">
+              <input className="bg-transparent text-[10px] font-black uppercase text-white px-4 py-2 border-none outline-none w-32 tracking-wider" 
+                type="date" value={from} onChange={e => setFrom(e.target.value)} />
+              <div className="flex items-center text-text-muted"><ArrowUpRight size={14}/></div>
+              <input className="bg-transparent text-[10px] font-black uppercase text-white px-4 py-2 border-none outline-none w-32 tracking-wider" 
+                type="date" value={to} onChange={e => setTo(e.target.value)} />
+           </div>
+           <button onClick={fetchReports} className="btn btn-primary h-14 px-8 text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-accent/40"><Filter size={18}/></button>
+        </div>
       </div>
 
-      {/* Date Filter */}
-      <div className="filter-bar" style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-muted)' }}>From:</div>
-        <input className="form-input" type="date" value={from} onChange={e => setFrom(e.target.value)} style={{ width: 160 }} />
-        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>To:</div>
-        <input className="form-input" type="date" value={to} onChange={e => setTo(e.target.value)} style={{ width: 160 }} />
-        <button className="btn btn-primary btn-sm" onClick={fetchReports}>Apply Filter</button>
-      </div>
-
-      {loading ? (
-        <div className="loading-spinner"><div className="spinner" /></div>
-      ) : (
+      {loading ?<div className="flex items-center justify-center h-96"><div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div></div> : (
         <>
-          {/* KPI Cards */}
-          <div className="stats-grid" style={{ marginBottom: 28 }}>
-            <div className="stat-card accent">
-              <div className="stat-header"><div className="stat-icon">💰</div></div>
-              <div className="stat-value">₹{revenue?.totalRevenue?.toLocaleString() || 0}</div>
-              <div className="stat-label">Total Revenue</div>
-            </div>
-            <div className="stat-card success">
-              <div className="stat-header"><div className="stat-icon">🧮</div></div>
-              <div className="stat-value">₹{revenue?.totalTax?.toLocaleString() || 0}</div>
-              <div className="stat-label">Total Tax Collected</div>
-            </div>
-            <div className="stat-card warning">
-              <div className="stat-header"><div className="stat-icon">🎯</div></div>
-              <div className="stat-value">₹{revenue?.totalDiscount?.toLocaleString() || 0}</div>
-              <div className="stat-label">Total Discounts Given</div>
-            </div>
-            <div className="stat-card info">
-              <div className="stat-header"><div className="stat-icon">💳</div></div>
-              <div className="stat-value">₹{pays?.totalCollected?.toLocaleString() || 0}</div>
-              <div className="stat-label">Payments Collected</div>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+               { l: 'Profitability Index', v: revenue?.totalRevenue, i: '💰', c: 'text-success', b: 'bg-success/10' },
+               { l: 'Tax Inflow Trace', v: revenue?.totalTax, i: '🧮', c: 'text-accent', b: 'bg-accent/10' },
+               { l: 'Marketing Burn', v: revenue?.totalDiscount, i: '🎯', c: 'text-warning', b: 'bg-warning/10' },
+               { l: 'Cash Collection', v: pays?.totalCollected, i: '💳', c: 'text-info', b: 'bg-info/10' },
+            ].map((kpi, idx) => (
+              <div key={idx} className="card group hover:scale-[1.03] transition-all bg-gradient-to-br from-secondary/80 to-secondary/40 border-white/[0.03]">
+                 <div className="flex justify-between items-start mb-6">
+                    <div className={`p-4 rounded-2xl ${kpi.b} ${kpi.c} transition-transform group-hover:rotate-12`}>
+                       <span className="text-2xl">{kpi.i}</span>
+                    </div>
+                    <div className="p-2 hover:bg-background rounded-lg border border-transparent hover:border-border transition-all cursor-help"><Info size={14} className="text-text-muted"/></div>
+                 </div>
+                 <div className="text-[9px] font-black uppercase tracking-[0.25em] text-text-muted mb-2">{kpi.l}</div>
+                 <div className="text-3xl font-black text-white tracking-tighter leading-none">₹{kpi.v?.toLocaleString() || 0}</div>
+              </div>
+            ))}
           </div>
 
-          {/* Charts Row 1 */}
-          <div className="charts-grid" style={{ marginBottom: 20 }}>
-            <div className="chart-wrapper">
-              <div className="chart-title">Revenue by Invoice Status</div>
-              <div className="chart-subtitle">How revenue is spread across invoice states</div>
-              <ResponsiveContainer width="100%" height={220}>
-                <BarChart data={revByStatus} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-                  <XAxis dataKey="name" tick={{ fill: '#555568', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fill: '#555568', fontSize: 11 }} axisLine={false} tickLine={false} />
-                  <Tooltip contentStyle={{ background: '#16161f', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 8, fontSize: 12 }} />
-                  <Bar dataKey="value" fill="#6c63ff" radius={[6,6,0,0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+             <div className="lg:col-span-2 card">
+                <div className="flex justify-between items-center mb-10">
+                   <div>
+                      <h2 className="text-xl font-black text-white">Consolidated Revenue Stream</h2>
+                      <p className="text-xs text-text-muted font-bold tracking-widest uppercase mt-1">Cross-status distribution cycle</p>
+                   </div>
+                   <button className="p-2.5 rounded-xl bg-background border border-border text-text-muted hover:text-white transition-all"><Download size={18}/></button>
+                </div>
+                <div className="h-80 w-full">
+                   <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={revByStatus}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#16161f" vertical={false} />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#555568', fontSize: 11, fontWeight: '700'}} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#555568', fontSize: 11, fontWeight: '700'}} />
+                        <Tooltip contentStyle={{background: '#16161f', border: '1px solid #222', borderRadius: '12px', fontSize: '11px', fontWeight: 'bold'}} />
+                        <Bar dataKey="value" fill="#6c63ff" radius={[8, 8, 0, 0]} barSize={40} />
+                      </BarChart>
+                   </ResponsiveContainer>
+                </div>
+             </div>
 
-            <div className="chart-wrapper">
-              <div className="chart-title">Subscriptions by Status</div>
-              <div className="chart-subtitle">{subs?.total || 0} subscriptions in period</div>
-              <ResponsiveContainer width="100%" height={180}>
-                <PieChart>
-                  <Pie data={subStatusData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={4} dataKey="value">
-                    {subStatusData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                  </Pie>
-                  <Tooltip contentStyle={{ background: '#16161f', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 8, fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                {subStatusData.map((d, i) => (
-                  <span key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--text-secondary)' }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: COLORS[i % COLORS.length], display: 'inline-block' }} />
-                    {d.name} ({d.value})
-                  </span>
-                ))}
-              </div>
-            </div>
+             <div className="card flex flex-col items-center justify-between">
+                <div className="w-full text-center">
+                   <h2 className="text-xl font-black text-white italic">Asset Status Breakdown</h2>
+                   <p className="text-[10px] text-text-muted font-black tracking-[0.2em] uppercase mt-1">Lifecycle segmentation</p>
+                </div>
+                <div className="w-full h-64 my-6">
+                   <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie data={subStatusData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={4} dataKey="value" stroke="none">
+                           {subStatusData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                        </Pie>
+                        <Tooltip contentStyle={{background: '#16161f', border: 'none', borderRadius: '12px', fontSize: '10px'}} />
+                      </PieChart>
+                   </ResponsiveContainer>
+                </div>
+                <div className="grid grid-cols-2 w-full gap-3">
+                   {subStatusData.map((d, i) => (
+                      <div key={d.name} className="p-3 bg-background/50 border border-border rounded-xl">
+                         <div className="flex items-center gap-1.5 mb-1.5">
+                            <div className="w-2 h-2 rounded-full" style={{ background: COLORS[i % COLORS.length] }}></div>
+                            <span className="text-[9px] font-black uppercase text-text-muted tracking-widest truncate">{d.name}</span>
+                         </div>
+                         <div className="text-xl font-black text-white">{d.value}</div>
+                      </div>
+                   ))}
+                </div>
+             </div>
           </div>
 
-          {/* Payments by Method */}
-          <div className="chart-wrapper">
-            <div className="chart-title">Payments by Method</div>
-            <div className="chart-subtitle">{pays?.total || 0} transactions · ₹{pays?.totalCollected?.toLocaleString() || 0} total</div>
-            {payMethodData.length === 0 ? (
-              <div className="empty-state" style={{ padding: 40 }}>
-                <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>No payments in this period</div>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginTop: 16 }}>
+          <div className="card">
+             <div className="mb-10 text-center font-black italic">
+                <h2 className="text-xl text-white py-2">Transaction Methodology</h2>
+                <div className="w-24 h-1 bg-accent mx-auto rounded-full shadow-[0_0_12px_#6c63ff]"></div>
+             </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {payMethodData.map((d, i) => (
-                  <div key={d.name} style={{ flex: '1 1 160px', background: 'var(--bg-secondary)', borderRadius: 10, padding: 16, border: '1px solid var(--border)' }}>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'capitalize' }}>{d.name.replace('_', ' ')}</div>
-                    <div style={{ fontSize: 22, fontWeight: 800, color: COLORS[i % COLORS.length] }}>₹{d.value?.toFixed(2)}</div>
+                  <div key={d.name} className="relative group p-8 rounded-3xl bg-secondary/30 border border-border hover:border-accent/40 transition-all overflow-hidden">
+                     <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-all"></div>
+                     <div className="text-[9px] font-black text-text-muted uppercase tracking-[0.3em] mb-4">{d.name.replace('_', ' ')}</div>
+                     <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-black text-white">₹{d.value?.toFixed(0)}</span>
+                        <TrendingUp size={16} className="text-success"/>
+                     </div>
+                     <div className="mt-6 flex flex-col gap-1.5">
+                        <div className="h-1 bg-background rounded-full overflow-hidden">
+                           <div className="h-full bg-accent transition-all duration-1000" style={{ width: `${Math.min((d.value/pays?.totalCollected)*200, 100)}%` }}></div>
+                        </div>
+                        <div className="text-[8px] font-black text-text-muted uppercase tracking-widest text-right">Volume Weight {(d.value/pays?.totalCollected*100).toFixed(1)}%</div>
+                     </div>
                   </div>
                 ))}
-              </div>
-            )}
+             </div>
           </div>
         </>
       )}
