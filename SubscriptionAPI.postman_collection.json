@@ -1,0 +1,527 @@
+{
+  "info": {
+    "name": "Subscription Management System",
+    "description": "Full API testing flow for the SaaS Subscription Backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5000/api" },
+    { "key": "admin_token", "value": "" },
+    { "key": "customer_token", "value": "" },
+    { "key": "product_id", "value": "" },
+    { "key": "plan_id", "value": "" },
+    { "key": "subscription_id", "value": "" },
+    { "key": "invoice_id", "value": "" },
+    { "key": "payment_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Auth",
+      "item": [
+        {
+          "name": "1.1 Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('admin_token', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@saas.com\",\n  \"password\": \"Admin@1234\"\n}"
+            },
+            "url": "{{BASE_URL}}/auth/login"
+          }
+        },
+        {
+          "name": "1.2 Customer Signup",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('customer_token', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Customer\",\n  \"email\": \"testcustomer@example.com\",\n  \"password\": \"Test@1234\"\n}"
+            },
+            "url": "{{BASE_URL}}/auth/signup"
+          }
+        },
+        {
+          "name": "1.3 Customer Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.token) pm.collectionVariables.set('customer_token', json.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Alice@1234\"\n}"
+            },
+            "url": "{{BASE_URL}}/auth/login"
+          }
+        },
+        {
+          "name": "1.4 Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Admin@1234\",\n  \"newPassword\": \"Admin@5678\"\n}"
+            },
+            "url": "{{BASE_URL}}/auth/reset-password"
+          }
+        },
+        {
+          "name": "1.5 Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/auth/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Products",
+      "item": [
+        {
+          "name": "2.1 Create Product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('product_id', json._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cloud Storage Plan\",\n  \"type\": \"Software\",\n  \"salesPrice\": 1499,\n  \"costPrice\": 400,\n  \"variants\": [\n    { \"attribute\": \"Storage\", \"value\": \"100GB\", \"extraPrice\": 0 },\n    { \"attribute\": \"Storage\", \"value\": \"500GB\", \"extraPrice\": 300 }\n  ]\n}"
+            },
+            "url": "{{BASE_URL}}/products"
+          }
+        },
+        {
+          "name": "2.2 Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/products"
+          }
+        },
+        {
+          "name": "2.3 Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/products/{{product_id}}"
+          }
+        },
+        {
+          "name": "2.4 Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"salesPrice\": 1799\n}"
+            },
+            "url": "{{BASE_URL}}/products/{{product_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Plans",
+      "item": [
+        {
+          "name": "3.1 Create Plan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('plan_id', json._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pro Monthly\",\n  \"price\": 1499,\n  \"billingPeriod\": \"monthly\",\n  \"minQuantity\": 1,\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2027-12-31\",\n  \"options\": {\n    \"autoClose\": false,\n    \"closable\": true,\n    \"pausable\": true,\n    \"renewable\": true\n  }\n}"
+            },
+            "url": "{{BASE_URL}}/plans"
+          }
+        },
+        {
+          "name": "3.2 Get All Plans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/plans"
+          }
+        },
+        {
+          "name": "3.3 Get Active Plans",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/plans?active=true",
+              "query": [{ "key": "active", "value": "true" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Tax & Discounts",
+      "item": [
+        {
+          "name": "4.1 Create Tax",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"GST 18%\",\n  \"percentage\": 18\n}"
+            },
+            "url": "{{BASE_URL}}/tax"
+          }
+        },
+        {
+          "name": "4.2 Get All Taxes",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/tax"
+          }
+        },
+        {
+          "name": "4.3 Create Discount",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SAVE10\",\n  \"type\": \"percentage\",\n  \"value\": 10,\n  \"minPurchase\": 500,\n  \"minQuantity\": 1,\n  \"startDate\": \"2025-01-01\",\n  \"endDate\": \"2027-12-31\",\n  \"usageLimit\": 50\n}"
+            },
+            "url": "{{BASE_URL}}/discounts"
+          }
+        },
+        {
+          "name": "4.4 Get All Discounts",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/discounts"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Subscriptions",
+      "item": [
+        {
+          "name": "5.1 Create Subscription (draft)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('subscription_id', json._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": \"<alice_customer_id>\",\n  \"plan\": \"{{plan_id}}\",\n  \"startDate\": \"2026-05-01\",\n  \"expirationDate\": \"2027-04-30\",\n  \"paymentTerms\": \"immediate\",\n  \"orderLines\": [\n    {\n      \"product\": \"{{product_id}}\",\n      \"quantity\": 1,\n      \"unitPrice\": 1499,\n      \"tax\": 18\n    }\n  ]\n}"
+            },
+            "url": "{{BASE_URL}}/subscriptions"
+          }
+        },
+        {
+          "name": "5.2 Move to Quotation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"quotation\" }" },
+            "url": "{{BASE_URL}}/subscriptions/{{subscription_id}}/status"
+          }
+        },
+        {
+          "name": "5.3 Confirm Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"confirmed\" }" },
+            "url": "{{BASE_URL}}/subscriptions/{{subscription_id}}/status"
+          }
+        },
+        {
+          "name": "5.4 Activate Subscription (auto-generates invoice)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"active\" }" },
+            "url": "{{BASE_URL}}/subscriptions/{{subscription_id}}/status"
+          }
+        },
+        {
+          "name": "5.5 Pause Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/subscriptions/{{subscription_id}}/pause"
+          }
+        },
+        {
+          "name": "5.6 Resume Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/subscriptions/{{subscription_id}}/resume"
+          }
+        },
+        {
+          "name": "5.7 Get Subscription Invoices",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.length > 0) pm.collectionVariables.set('invoice_id', json[0]._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/subscriptions/{{subscription_id}}/invoices"
+          }
+        },
+        {
+          "name": "5.8 Close Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"closed\" }" },
+            "url": "{{BASE_URL}}/subscriptions/{{subscription_id}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Invoices",
+      "item": [
+        {
+          "name": "6.1 Generate Invoice Manually",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json._id) pm.collectionVariables.set('invoice_id', json._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subscriptionId\": \"{{subscription_id}}\",\n  \"tax\": 18,\n  \"discountCode\": \"LAUNCH20\"\n}"
+            },
+            "url": "{{BASE_URL}}/invoices"
+          }
+        },
+        {
+          "name": "6.2 Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/invoices"
+          }
+        },
+        {
+          "name": "6.3 Confirm Invoice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{ \"status\": \"confirmed\" }" },
+            "url": "{{BASE_URL}}/invoices/{{invoice_id}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Payments",
+      "item": [
+        {
+          "name": "7.1 Record Payment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.payment?._id) pm.collectionVariables.set('payment_id', json.payment._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoice\": \"{{invoice_id}}\",\n  \"method\": \"card\",\n  \"amount\": 1768.82,\n  \"note\": \"Card payment processed online\"\n}"
+            },
+            "url": "{{BASE_URL}}/payments"
+          }
+        },
+        {
+          "name": "7.2 Get All Payments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": "{{BASE_URL}}/payments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Reports",
+      "item": [
+        {
+          "name": "8.1 Revenue Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/reports/revenue?from=2026-01-01&to=2026-12-31",
+              "query": [
+                { "key": "from", "value": "2026-01-01" },
+                { "key": "to", "value": "2026-12-31" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "8.2 Subscriptions Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/reports/subscriptions?status=active",
+              "query": [{ "key": "status", "value": "active" }]
+            }
+          }
+        },
+        {
+          "name": "8.3 Payments Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{admin_token}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/reports/payments?from=2026-01-01&to=2026-12-31",
+              "query": [
+                { "key": "from", "value": "2026-01-01" },
+                { "key": "to", "value": "2026-12-31" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
