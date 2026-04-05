@@ -1,36 +1,228 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RevFlow — SaaS Subscription Management Platform
 
-## Getting Started
+A production-quality full-stack SaaS subscription management platform built with
+**Next.js 14**, **TypeScript**, **Supabase**, **Tailwind CSS**, and **Razorpay**.
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 14 (App Router) |
+| Language | TypeScript 5 (strict mode) |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| ORM/Client | @supabase/ssr + @supabase/supabase-js |
+| Payments | Razorpay |
+| Styling | Tailwind CSS + Custom CSS |
+
+---
+
+## Project Structure
+
+```
+revflow/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/page.tsx          # Email + password login
+│   │   └── register/page.tsx       # Sign-up → users table insert
+│   ├── (dashboard)/
+│   │   ├── dashboard/page.tsx      # Admin stats OR customer overview
+│   │   ├── shop/page.tsx           # Browse plans, monthly/yearly toggle
+│   │   ├── checkout/[invoiceId]/   # Invoice summary → coupon → Razorpay
+│   │   ├── subscriptions/page.tsx  # List + soft-cancel
+│   │   ├── invoices/page.tsx       # Table + detail modal
+│   │   └── admin/users/page.tsx    # Admin: manage users
+│   └── api/
+│       ├── subscriptions/create/   # POST: create subscription + invoice
+│       ├── payments/create-order/  # POST: Razorpay order creation
+│       ├── payments/verify/        # POST: HMAC verification + activation
+│       ├── dashboard/stats/        # GET: admin reporting RPCs
+│       └── invoices/[id]/          # GET: invoice with items
+├── components/
+│   ├── DashboardSidebar.tsx        # Role-aware navigation sidebar
+│   ├── AdminDashboard.tsx          # Stats + bar chart + pending invoices
+│   └── CustomerDashboard.tsx       # Subscriptions + recent invoices
+├── lib/supabase/
+│   ├── client.ts                   # Browser client (createBrowserClient)
+│   ├── server.ts                   # Server client (createServerClient)
+│   └── middleware.ts               # Session refresh middleware helper
+├── supabase/
+│   ├── migrations/001_init.sql     # 11 tables + indexes + RLS policies
+│   ├── functions/rpc.sql           # 11 PostgreSQL RPC functions
+│   └── seed.sql                    # Sample data (3 users, 6 plans, etc.)
+├── types/database.ts               # Full TypeScript types for all tables
+├── middleware.ts                   # Next.js Edge Middleware (route guard)
+└── .env.local.example              # Environment variable template
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.local.example` → `.env.local` and fill in:
 
-## Learn More
+| Variable | Where to find | Exposed to browser? |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard → Project Settings → API | ✅ Yes |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Dashboard → Project Settings → API | ✅ Yes |
+| `NEXT_PUBLIC_RAZORPAY_KEY_ID` | Razorpay Dashboard → Settings → API Keys | ✅ Yes |
+| `RAZORPAY_KEY_ID` | Razorpay Dashboard → Settings → API Keys | ❌ Server only |
+| `RAZORPAY_KEY_SECRET` | Razorpay Dashboard → Settings → API Keys | ❌ Server only |
+| `NEXT_PUBLIC_APP_URL` | Your deployed URL | ✅ Yes |
 
-To learn more about Next.js, take a look at the following resources:
+> ⚠️ **Never commit `.env.local`** to version control. It's already in `.gitignore`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Setup Steps
 
-## Deploy on Vercel
+### 1. Create Supabase Project
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Go to [supabase.com](https://supabase.com) → New Project
+2. Choose a region close to your users
+3. Save the database password somewhere safe
+4. Wait for the project to initialize (~2 minutes)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Enable Email Auth
+
+1. In Supabase Dashboard → **Authentication → Providers**
+2. Ensure **Email** provider is enabled
+3. (Optional) Disable "Confirm email" for faster local development
+
+### 3. Run the Migration SQL
+
+In Supabase Dashboard → **SQL Editor**, paste and run the contents of:
+
+```
+supabase/migrations/001_init.sql
+```
+
+This creates all 11 tables, indexes, RLS policies, and the helper function.
+
+### 4. Run the RPC Functions
+
+In Supabase Dashboard → **SQL Editor**, paste and run:
+
+```
+supabase/functions/rpc.sql
+```
+
+This creates all 11 PostgreSQL RPC functions.
+
+### 5. Seed Sample Data
+
+In Supabase Dashboard → **SQL Editor**, paste and run:
+
+```
+supabase/seed.sql
+```
+
+> **Important:** The seed inserts into `public.users`, but Supabase Auth (`auth.users`) is separate.
+> To log in as the seed users, you must create them in:
+> **Authentication → Users → Add User** with these emails:
+> - `admin@revflow.com`
+> - `internal@revflow.com`
+> - `customer@revflow.com`
+>
+> Use the same UUID shown in `seed.sql` OR update the UUIDs in `seed.sql` to match
+> those auto-generated by Supabase Auth before running the seed.
+
+### 6. Set Up Razorpay
+
+1. Create an account at [razorpay.com](https://razorpay.com)
+2. Go to **Settings → API Keys → Generate Test Key**
+3. Copy the `Key ID` and `Key Secret`
+4. Add them to `.env.local`
+
+> For local development, use Razorpay **Test Mode** keys (prefixed `rzp_test_`).
+
+### 7. Configure Environment Variables
+
+```bash
+cp .env.local.example .env.local
+# Edit .env.local with your actual keys
+```
+
+### 8. Run Locally
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+---
+
+## User Roles
+
+| Role | Access |
+|------|--------|
+| `admin` | Full CRUD on all data, dashboard stats, user management |
+| `internal` | Read-only on products, plans, variants, discounts, taxes |
+| `customer` | Own subscriptions, invoices, payments only |
+
+---
+
+## API Routes
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/api/subscriptions/create` | Customer | Creates subscription + invoice |
+| `POST` | `/api/payments/create-order` | Customer | Creates Razorpay order |
+| `POST` | `/api/payments/verify` | Customer | HMAC verify + activate subscription |
+| `GET` | `/api/dashboard/stats` | Admin | Revenue, active subs, MRR |
+| `GET` | `/api/invoices/[id]` | Customer/Admin | Invoice + line items |
+
+---
+
+## Payment Flow
+
+```
+Customer clicks "Subscribe"
+    → POST /api/subscriptions/create (RPC: create_subscription)
+    → Redirect to /checkout/[invoiceId]
+
+Checkout page:
+    → (Optional) Apply coupon via apply_discount_to_invoice RPC
+    → Click "Pay Now"
+    → POST /api/payments/create-order (Razorpay order created)
+    → Razorpay modal opens in browser
+    → Customer pays
+
+On success:
+    → POST /api/payments/verify
+    → HMAC-SHA256 signature verified
+    → RPC verify_and_activate: payment=success, invoice=paid, subscription=active
+    → Redirect to /subscriptions
+```
+
+---
+
+## Security Notes
+
+- Service role key is **never** used in this codebase (all server calls use anon key with RLS)
+- Razorpay secret key stays **server-side only** (in API routes)
+- All money values use `NUMERIC(12,2)` — no floating point rounding errors
+- RLS policies enforce data isolation per user role at the database level
+- HMAC-SHA256 signature verification prevents payment tampering
+
+---
+
+## SETUP CHECKLIST
+
+```
+[ ] Create Supabase project at supabase.com
+[ ] Enable Email Auth provider in Supabase Dashboard
+[ ] Run supabase/migrations/001_init.sql in SQL Editor
+[ ] Run supabase/functions/rpc.sql in SQL Editor
+[ ] (Optional) Run supabase/seed.sql for sample data
+[ ] Create seed auth users in Authentication → Users with matching emails
+[ ] Create Razorpay account → generate Test API keys
+[ ] Copy .env.local.example → .env.local and fill in all values
+[ ] npm install
+[ ] npm run dev → open http://localhost:3000
+[ ] For production: Add env vars in Vercel Dashboard → Project Settings → Environment Variables
+[ ] For production: Switch Razorpay keys from rzp_test_ to rzp_live_
+[ ] For production: Update NEXT_PUBLIC_APP_URL to your production domain
+```

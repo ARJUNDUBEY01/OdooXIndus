@@ -1,0 +1,61 @@
+﻿
+> revflow@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.35
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+node.exe : Failed to 
+compile.
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (F  
+  ailed to compile.:Str   
+ ing) [], RemoteExcept    
+ion
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+./app/(dashboard)/admin/us
+ers/page.tsx:34:18
+Type error: Property 
+'role' does not exist on 
+type 'never'.
+
+[0m [90m 32 |[39m      
+ [33m.[39msingle()[33m;
+[39m[0m
+[0m [90m 33 |[39m[0m
+[0m[31m[1m>[22m[39m[
+90m 34 |[39m     
+[36mif[39m (profile[33m
+?[39m[33m.[39mrole 
+[33m!==[39m 
+[32m'admin'[39m) {[0m
+[0m [90m    |[39m      
+            
+[31m[1m^[22m[39m[0m
+[0m [90m 35 |[39m      
+ setError([32m'Access 
+denied. Admin only.'[39m)
+[33m;[39m[0m
+[0m [90m 36 |[39m      
+ setLoading([36mfalse[39
+m)[33m;[39m[0m
+[0m [90m 37 |[39m      
+ [36mreturn[39m[33m;[3
+9m[0m
+Next.js build worker 
+exited with code: 1 and 
+signal: null

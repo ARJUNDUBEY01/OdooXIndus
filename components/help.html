@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>RevFlow - Subscription Plans</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#47445f",
+                        "primary": "#005ac2",
+                        "surface-container-highest": "#dbe4e7",
+                        "secondary": "#5e5f65",
+                        "on-background": "#2b3437",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#504e69",
+                        "secondary-fixed-dim": "#d4d4db",
+                        "on-secondary": "#f9f8ff",
+                        "on-primary-fixed": "#003c86",
+                        "surface-tint": "#005ac2",
+                        "on-secondary-fixed": "#3e3f45",
+                        "surface": "#f8f9fa",
+                        "surface-container-high": "#e2e9ec",
+                        "on-surface-variant": "#586064",
+                        "tertiary-dim": "#53506b",
+                        "surface-container-low": "#f1f4f6",
+                        "secondary-container": "#e2e2e9",
+                        "error-dim": "#4e0309",
+                        "tertiary": "#5f5c78",
+                        "on-primary-fixed-variant": "#0057bd",
+                        "tertiary-container": "#d3ceef",
+                        "surface-variant": "#dbe4e7",
+                        "on-error": "#fff7f6",
+                        "background": "#f8f9fa",
+                        "tertiary-fixed-dim": "#c5c0e0",
+                        "on-surface": "#2b3437",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#9b9d9e",
+                        "tertiary-fixed": "#d3ceef",
+                        "on-tertiary-fixed": "#34314b",
+                        "primary-dim": "#004fab",
+                        "on-secondary-container": "#505157",
+                        "outline": "#737c7f",
+                        "on-error-container": "#752121",
+                        "inverse-surface": "#0c0f10",
+                        "primary-container": "#d8e2ff",
+                        "primary-fixed-dim": "#c3d4ff",
+                        "secondary-fixed": "#e2e2e9",
+                        "on-tertiary": "#fcf7ff",
+                        "outline-variant": "#abb3b7",
+                        "surface-dim": "#d1dce0",
+                        "surface-container": "#eaeff1",
+                        "inverse-primary": "#4d8eff",
+                        "on-primary-container": "#004eaa",
+                        "error-container": "#fe8983",
+                        "secondary-dim": "#515359",
+                        "on-secondary-fixed-variant": "#5a5b61",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary": "#f7f7ff",
+                        "error": "#9f403d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface antialiased">
+    <!-- SideNavBar (Predicted Component) -->
+    <aside
+        class="h-screen w-64 fixed left-0 top-0 bg-slate-50 dark:bg-slate-900/50 backdrop-blur-xl flex flex-col py-6 px-4 z-50">
+        <div class="mb-8 px-4 flex items-center gap-3">
+            <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-sm">dashboard</span>
+            </div>
+            <div>
+                <div class="text-xl font-bold tracking-tighter text-slate-900 dark:text-white">RevFlow</div>
+                <div class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">SaaS Management
+                </div>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 scale-95 active:scale-90"
+                href="#">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-manrope font-semibold text-sm tracking-tight">Overview</span>
+            </a>
+            <!-- Active Tab: Products -->
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-blue-600 dark:text-blue-400 font-bold border-r-4 border-blue-600 bg-blue-50/50 dark:bg-blue-900/20 scale-95 active:scale-90"
+                href="#">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-manrope font-semibold text-sm tracking-tight">Products</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 scale-95 active:scale-90"
+                href="#">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <span class="font-manrope font-semibold text-sm tracking-tight">Orders</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 scale-95 active:scale-90"
+                href="#">
+                <span class="material-symbols-outlined">receipt_long</span>
+                <span class="font-manrope font-semibold text-sm tracking-tight">Invoices</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 scale-95 active:scale-90"
+                href="#">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-manrope font-semibold text-sm tracking-tight">Settings</span>
+            </a>
+        </nav>
+        <div class="mt-auto px-4 py-4 bg-surface-container-low rounded-2xl flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+                <img class="w-full h-full object-cover"
+                    data-alt="professional male portrait with clean background for corporate avatar"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnfCNMhUy8AehzwXQ80MBsJe1gLx_yxWEiLCTqlajrchTyllzhktpALV9trrqHttS6t2TtflslweYfKC3eBSLUrmj4qEpvTn0Sr-UFx65uYnBnY4Fik7cULxohIRBho6AYZdtgmMUG4fSjn-LNl7MDXXRi0oNoSeKcsWqhVBz6PCFiJqZGw6VWFTVu3gq4qow1ySeOBP1e4thJfX4CZyiKFvrgh1-mnBxWKEQ9_0Pscet8tCOkDlRvoJXkqrrCKX2mVElK7h-mRlk" />
+            </div>
+            <div class="overflow-hidden">
+                <p class="text-sm font-bold truncate">Alex Rivera</p>
+                <p class="text-xs text-on-surface-variant truncate">Premium Admin</p>
+            </div>
+        </div>
+    </aside>
+    <!-- TopNavBar (Predicted Component) -->
+    <header
+        class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md flex justify-between items-center px-8 z-40 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center w-96 relative">
+            <span class="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+            <input
+                class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                placeholder="Search plans or invoices..." type="text" />
+        </div>
+        <div class="flex items-center gap-6">
+            <button class="text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all">
+                <span class="material-symbols-outlined">notifications</span>
+            </button>
+            <button class="text-slate-600 dark:text-slate-400 hover:text-blue-500 transition-all">
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+            <div class="h-8 w-[1px] bg-outline-variant/15"></div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-on-surface">Alex R.</span>
+            </div>
+        </div>
+    </header>
+    <!-- Main Content -->
+    <main class="ml-64 pt-24 px-8 pb-12">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-10">
+                <h1 class="text-4xl font-extrabold tracking-tight mb-2">Subscription Plans</h1>
+                <p class="text-on-surface-variant max-w-2xl">Scale your revenue operations with precision. Choose a plan
+                    that aligns with your growth trajectory.</p>
+            </div>
+            <div class="flex gap-8">
+                <!-- Sidebar Filters -->
+                <aside class="w-64 shrink-0 space-y-8">
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15">
+                        <h3 class="text-xs font-extrabold uppercase tracking-widest text-on-surface-variant mb-6">Price
+                            Range</h3>
+                        <div class="space-y-4">
+                            <input
+                                class="w-full h-1.5 bg-surface-container-high rounded-lg appearance-none cursor-pointer accent-primary"
+                                type="range" />
+                            <div class="flex justify-between text-xs font-bold text-on-surface">
+                                <span>₹0</span>
+                                <span>₹50,000+</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15">
+                        <h3 class="text-xs font-extrabold uppercase tracking-widest text-on-surface-variant mb-6">
+                            Categories</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input checked=""
+                                    class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/20"
+                                    type="checkbox" />
+                                <span
+                                    class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Developer</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input checked=""
+                                    class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/20"
+                                    type="checkbox" />
+                                <span
+                                    class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Business</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary/20"
+                                    type="checkbox" />
+                                <span
+                                    class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Enterprise</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden rounded-xl h-48 group">
+                        <img class="absolute inset-0 w-full h-full object-cover"
+                            data-alt="abstract artistic blue gradient flowing background with subtle geometric depth"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjTRuBl_q-AZzOovtz6BL3QKuYdEBZ4GE0e3WnfrIoGcev9pETSKgaR3y6Wz6so4rueC-SyRpuSANyFOfTVWKLdyH2HoM_RCPGSG1jJRBrpjr3-4VgsjXFXupopPOa0q_ov14NPkl0efzBVK2PtOeEU-U0wzZsy46fVZTHZBNe0Mv6W96y3JCau8kfpcfjA0nrtPvKz2x4LXWiAmL3s9PQ7Y7pAlmziQTO--8L8IC1LkoK0A2ogLhP38glzmcm6qipY0LnWTFWmGQ" />
+                        <div class="absolute inset-0 bg-primary/40 backdrop-blur-sm p-6 flex flex-col justify-end">
+                            <p class="text-white font-bold text-sm mb-1">Need help scaling?</p>
+                            <p class="text-white/80 text-xs mb-3">Talk to our strategy team.</p>
+                            <button
+                                class="bg-white text-primary text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-lg w-fit transition-transform hover:scale-105 active:scale-95">Contact
+                                Sales</button>
+                        </div>
+                    </div>
+                </aside>
+                <!-- Grid of Plans -->
+                <div class="flex-1">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Plan Card: Basic -->
+                        <div
+                            class="bg-surface-container-lowest border border-outline-variant/15 p-8 rounded-xl flex flex-col hover:shadow-lg transition-shadow duration-300 group">
+                            <div class="mb-8">
+                                <div class="text-primary text-xs font-extrabold uppercase tracking-tighter mb-2">Core
+                                    Access</div>
+                                <h2 class="text-2xl font-extrabold">Basic</h2>
+                            </div>
+                            <div class="mb-8">
+                                <span class="text-4xl font-extrabold tracking-tight">₹2,999</span>
+                                <span class="text-on-surface-variant font-medium">/month</span>
+                            </div>
+                            <ul class="space-y-4 mb-10 flex-1">
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    5 Active projects
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Core data exports
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Email support
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant/40">
+                                    <span class="material-symbols-outlined text-lg">cancel</span>
+                                    Custom API access
+                                </li>
+                            </ul>
+                            <button
+                                class="w-full py-3 px-4 bg-surface-container-high text-on-surface font-bold text-sm rounded-xl transition-all duration-200 group-hover:bg-primary group-hover:text-white">View
+                                Plan</button>
+                        </div>
+                        <!-- Plan Card: Pro (Featured) -->
+                        <div
+                            class="bg-surface-container-lowest border-2 border-primary/20 p-8 rounded-xl flex flex-col relative overflow-hidden shadow-2xl shadow-primary/5 group">
+                            <div class="absolute top-4 right-4">
+                                <span
+                                    class="bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">Most
+                                    Popular</span>
+                            </div>
+                            <div class="mb-8">
+                                <div class="text-primary text-xs font-extrabold uppercase tracking-tighter mb-2">Power
+                                    User</div>
+                                <h2 class="text-2xl font-extrabold">Pro</h2>
+                            </div>
+                            <div class="mb-8">
+                                <span class="text-4xl font-extrabold tracking-tight text-primary">₹7,999</span>
+                                <span class="text-on-surface-variant font-medium">/month</span>
+                            </div>
+                            <ul class="space-y-4 mb-10 flex-1">
+                                <li class="flex items-center gap-3 text-sm font-bold text-on-surface">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Unlimited projects
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-bold text-on-surface">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Real-time analytics
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-bold text-on-surface">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Priority support
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-bold text-on-surface">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Automation webhooks
+                                </li>
+                            </ul>
+                            <button
+                                class="w-full py-3 px-4 bg-gradient-to-br from-primary to-primary-dim text-white font-bold text-sm rounded-xl shadow-lg shadow-primary/20 transition-all duration-200 transform group-hover:-translate-y-1">View
+                                Plan</button>
+                        </div>
+                        <!-- Plan Card: Team -->
+                        <div
+                            class="bg-surface-container-lowest border border-outline-variant/15 p-8 rounded-xl flex flex-col hover:shadow-lg transition-shadow duration-300 group">
+                            <div class="mb-8">
+                                <div class="text-primary text-xs font-extrabold uppercase tracking-tighter mb-2">
+                                    Collaboration</div>
+                                <h2 class="text-2xl font-extrabold">Team</h2>
+                            </div>
+                            <div class="mb-8">
+                                <span class="text-4xl font-extrabold tracking-tight">₹19,999</span>
+                                <span class="text-on-surface-variant font-medium">/month</span>
+                            </div>
+                            <ul class="space-y-4 mb-10 flex-1">
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Up to 50 users
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Unified billing
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    Custom permissions
+                                </li>
+                                <li class="flex items-center gap-3 text-sm font-medium text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-primary text-lg"
+                                        style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    SAML/SSO Auth
+                                </li>
+                            </ul>
+                            <button
+                                class="w-full py-3 px-4 bg-surface-container-high text-on-surface font-bold text-sm rounded-xl transition-all duration-200 group-hover:bg-primary group-hover:text-white">View
+                                Plan</button>
+                        </div>
+                    </div>
+                    <!-- Comparison Strip (Metric Strip high-end UI pattern) -->
+                    <div
+                        class="mt-12 bg-surface-container-lowest p-1 rounded-2xl border border-outline-variant/10 shadow-sm">
+                        <div class="flex flex-col md:flex-row items-center justify-between px-8 py-6 gap-6">
+                            <div class="flex items-center gap-6">
+                                <div
+                                    class="w-12 h-12 bg-tertiary-container/30 flex items-center justify-center rounded-xl text-tertiary">
+                                    <span class="material-symbols-outlined">corporate_fare</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-on-surface">RevFlow Enterprise Ecosystem</p>
+                                    <p class="text-sm text-on-surface-variant">Unmatched volume support for Global
+                                        Fortune 500 companies.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-12 items-center">
+                                <div class="text-center">
+                                    <p
+                                        class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+                                        Max Transaction Limit</p>
+                                    <p class="text-xl font-extrabold tracking-tight">Unlimited</p>
+                                </div>
+                                <div class="text-center">
+                                    <p
+                                        class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+                                        Response Time</p>
+                                    <p class="text-xl font-extrabold tracking-tight">&lt; 15 mins</p>
+                                </div>
+                                <button
+                                    class="px-6 py-3 border border-outline-variant/20 rounded-xl font-bold text-sm hover:bg-surface-container-low transition-colors">Build
+                                    Custom Bundle</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

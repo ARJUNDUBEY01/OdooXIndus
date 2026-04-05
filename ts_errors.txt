@@ -1,0 +1,30 @@
+﻿app/(auth)/register/page.tsx(56,65): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "users", never, "POST">', gave the following error.
+    Argument of type '{ id: string; name: string; email: string; role: string; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "users", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'id' does not exist in type 'never[]'.
+app/(dashboard)/admin/users/page.tsx(34,18): error TS2339: Property 'role' does not exist on type 'never'.
+app/(dashboard)/admin/users/page.tsx(66,63): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(values: never, options?: { count?: "exact" | "planned" | "estimated" | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "users", never, "POST">', gave the following error.
+    Argument of type '{ name: string; email: string; role: UserRole; }' is not assignable to parameter of type 'never'.
+  Overload 2 of 2, '(values: never[], options?: { count?: "exact" | "planned" | "estimated" | undefined; defaultToNull?: boolean | undefined; } | undefined): PostgrestFilterBuilder<{ PostgrestVersion: "12"; }, never, never, null, "users", never, "POST">', gave the following error.
+    Object literal may only specify known properties, and 'name' does not exist in type 'never[]'.
+app/(dashboard)/checkout/[invoiceId]/page.tsx(125,7): error TS2345: Argument of type '{ p_invoice_id: string; p_discount_id: string; }' is not assignable to parameter of type 'undefined'.
+app/(dashboard)/checkout/[invoiceId]/page.tsx(151,43): error TS2345: Argument of type '{ p_invoice_id: string; }' is not assignable to parameter of type 'undefined'.
+app/(dashboard)/dashboard/page.tsx(28,15): error TS2339: Property 'role' does not exist on type 'never'.
+app/(dashboard)/dashboard/page.tsx(32,45): error TS2339: Property 'id' does not exist on type 'never'.
+app/(dashboard)/layout.tsx(37,124): error TS2353: Object literal may only specify known properties, and 'created_at' does not exist in type 'Pick<User, "id" | "name" | "email" | "role">'.
+app/(dashboard)/subscriptions/page.tsx(62,15): error TS2345: Argument of type '{ status: string; }' is not assignable to parameter of type 'never'.
+app/api/dashboard/stats/route.ts(32,21): error TS2339: Property 'role' does not exist on type 'never'.
+app/api/dashboard/stats/route.ts(47,45): error TS2345: Argument of type '{ p_year: number; }' is not assignable to parameter of type 'undefined'.
+app/api/payments/create-order/route.ts(54,17): error TS2339: Property 'status' does not exist on type 'never'.
+app/api/payments/create-order/route.ts(61,33): error TS2339: Property 'final_amount' does not exist on type 'never'.
+app/api/payments/create-order/route.ts(67,7): error TS2322: Type 'RazorpayOrder' is not assignable to type 'void'.
+app/api/payments/create-order/route.ts(87,7): error TS2345: Argument of type '{ p_invoice_id: string; }' is not assignable to parameter of type 'undefined'.
+app/api/payments/create-order/route.ts(102,15): error TS2345: Argument of type '{ razorpay_order_id: any; }' is not assignable to parameter of type 'never'.
+app/api/payments/create-order/route.ts(102,50): error TS2339: Property 'id' does not exist on type 'void'.
+app/api/payments/create-order/route.ts(107,33): error TS2339: Property 'id' does not exist on type 'void'.
+app/api/payments/verify/route.ts(72,17): error TS2345: Argument of type '{ status: string; }' is not assignable to parameter of type 'never'.
+app/api/payments/verify/route.ts(84,7): error TS2345: Argument of type '{ p_payment_id: string; p_razorpay_payment_id: string; p_razorpay_order_id: string; p_razorpay_signature: string; }' is not assignable to parameter of type 'undefined'.
+app/api/subscriptions/create/route.ts(68,7): error TS2345: Argument of type '{ p_user_id: string; p_plan_id: string; p_quantity: number; p_start_date: string; }' is not assignable to parameter of type 'undefined'.
+app/api/subscriptions/create/route.ts(103,29): error TS2339: Property 'id' does not exist on type 'never'.
